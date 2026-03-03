@@ -1,9 +1,12 @@
 
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using WebApplicationAPI.Abstracts;
 using WebApplicationAPI.DAL;
 using WebApplicationAPI.DAL.Abstracts;
 using WebApplicationAPI.DAL.Repositories;
+using WebApplicationAPI.Models;
 using WebApplicationAPI.Services;
 
 namespace WebApplicationAPI
@@ -24,17 +27,38 @@ namespace WebApplicationAPI
                 });
             });
 
-            // Add services to the container.
 
             builder.Services.AddControllers()
                 .AddJsonOptions(options =>
                 {
-            // Игнорируем циклические ссылки при сериализации в JSON
                 options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
 
-        // Опционально: делаем JSON более читаемым (красивые отступы)
                 options.JsonSerializerOptions.WriteIndented = true;
             });
+
+            builder.Services.AddSingleton<UsersStore>();
+
+            var jwt = builder.Configuration.GetSection("Jwt");
+            var key = jwt["Key"];
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(option =>
+                {
+                   option.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = jwt["Issuer"],
+                        ValidAudience = jwt["Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(key)),
+                        ClockSkew = TimeSpan.Zero
+                    };
+                });
+            builder.Services.AddAuthorization();
+
+            
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -59,8 +83,10 @@ namespace WebApplicationAPI
 
             app.UseCors("AllowReactApp");
 
+
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
 
