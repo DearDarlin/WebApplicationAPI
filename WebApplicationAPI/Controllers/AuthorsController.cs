@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WebApplicationAPI.Abstracts;
 using WebApplicationAPI.DAL.Entities;
 using WebApplicationAPI.Models;
@@ -23,6 +24,7 @@ namespace WebApplicationAPI.Controllers
             return Ok(authors);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost("author")]
         public IActionResult Add([FromBody] AuthorDTO authorDto)
         {
@@ -45,6 +47,7 @@ namespace WebApplicationAPI.Controllers
             return Ok(new { message = $"Author {author.FullName} added successfully!" });
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost("book")]
         public IActionResult AddBook([FromBody] BookDTO bookDto)
         {

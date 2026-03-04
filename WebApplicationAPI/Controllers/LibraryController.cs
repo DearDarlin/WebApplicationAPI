@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.Reflection.Metadata.Ecma335;
 using WebApplicationAPI.Abstracts;
 using WebApplicationAPI.Models;
@@ -61,6 +62,7 @@ namespace WebApplicationAPI.Controllers
             return Ok(response);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("author/{id}")]
         public IActionResult DeleteAuthor(int id)
         {
@@ -73,6 +75,7 @@ namespace WebApplicationAPI.Controllers
 
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("book/{id}")]
         public IActionResult DeleteBook(int id)
         {

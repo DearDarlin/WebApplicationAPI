@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WebApplicationAPI.Abstracts;
 using WebApplicationAPI.Models;
 
@@ -28,6 +29,7 @@ namespace WebApplicationAPI.Controllers
             return Ok(authorDto);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public IActionResult UpdateAuthor(int id, [FromBody] AuthorDTO authorDto)
         {
@@ -78,6 +80,7 @@ namespace WebApplicationAPI.Controllers
             return Ok(bookDto);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("book/{id}")]
         public IActionResult UpdateBook(int id, [FromBody] BookDTO bookDto)
         {
